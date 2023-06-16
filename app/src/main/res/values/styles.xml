@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 音乐卡片边圆角 -->
+    <style name="LeftRoundedCornerImageStyle">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">12dp</item>
+        <item name="cornerSizeBottomLeft">12dp</item>
+    </style>
+    <!-- 音乐卡片边圆角 -->
+    <style name="RoundedCornerImageStyleBottom">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">10dp</item>
+    </style>
+
+</resources>

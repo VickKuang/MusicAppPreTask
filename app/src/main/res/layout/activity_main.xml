@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black_bg">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/black_bg"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <ProgressBar
+                android:id="@+id/loading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="80dp"
+                android:visibility="invisible" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_song_cards"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="15dp"
+                android:clipToPadding="false"
+                android:paddingTop="20dp"
+                android:paddingBottom="10dp" />
+        </RelativeLayout>
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/ab_roll_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar">
+
+            <com.google.android.material.appbar.CollapsingToolbarLayout
+                android:id="@+id/tb_main_title"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:background="@drawable/bg_toolbar"
+                android:fitsSystemWindows="true"
+                app:contentScrim="@color/black_blue_start"
+                app:expandedTitleMarginBottom="60dp"
+                app:expandedTitleMarginEnd="64dp"
+                app:expandedTitleMarginStart="48dp"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+                app:statusBarScrim="@color/black_blue_start"
+                app:title="我的歌曲"
+                app:titleEnabled="true">
+
+                <RelativeLayout
+                    android:id="@+id/rl_jump"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:layout_marginStart="49dp"
+                        android:layout_marginBottom="50dp"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:padding="4dp"
+                            android:src="@drawable/icon_jump" />
+
+                        <TextView
+                            android:id="@+id/tv_jump_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text=" 我收藏的歌曲"
+
+                            />
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+                <Toolbar
+                    android:id="@+id/main_tb"
+                    android:layout_width="match_parent"
+                    android:layout_height="?android:attr/actionBarSize"
+                    app:layout_collapseMode="pin" />
+
+            </com.google.android.material.appbar.CollapsingToolbarLayout>
+        </com.google.android.material.appbar.AppBarLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <RelativeLayout
+        android:background="@drawable/bg_main_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginHorizontal="15dp"
+        android:layout_alignParentBottom="true">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/btn_jump_play"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+
+            app:shapeAppearance="@style/RoundedCornerImageStyleBottom" />
+        <LinearLayout
+            android:layout_toEndOf="@id/btn_jump_play"
+            android:gravity="center_vertical"
+            android:layout_marginStart="13dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
+            <TextView
+                android:id="@+id/tv_bottom_name"
+                android:layout_width="130dp"
+                android:layout_height="wrap_content"
+                android:textSize="15dp"
+                android:textColor="@color/bottom_text_bg"
+                android:singleLine="true"
+                android:layout_marginBottom="3dp"
+                />
+            <LinearLayout
+                android:layout_width="130dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="5dp">
+                <TextView
+                    android:id="@+id/tv_bottom_icon"
+                    android:singleLine="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="9dp"
+                    android:layout_marginEnd="6dp"
+                    android:background="@color/bottom_text_bg"
+                    android:textColor="@color/bottom_bg"
+                    android:visibility="invisible"
+                    android:text=" LYRICS "/>
+                <TextView
+                    android:singleLine="true"
+                    android:id="@+id/tv_bottom_singer"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/bottom_text_bg"
+                    android:textSize="11dp" />
+            </LinearLayout>
+
+        </LinearLayout>
+        <ImageButton
+            android:layout_toStartOf="@id/cb_main_start"
+            android:layout_centerVertical="true"
+            android:id="@+id/ib_main_pre"
+            android:background="@drawable/icon_pre"
+            android:layout_width="20dp"
+            android:layout_height="20dp" />
+        <CheckBox
+            android:layout_marginHorizontal="20dp"
+            android:layout_toStartOf="@id/ib_main_next"
+            android:id="@+id/cb_main_start"
+            android:layout_centerVertical="true"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:background="@drawable/selector_play"
+            android:layout_gravity="center"
+            android:button="@color/white"
+            android:checked="false"/>
+        <ImageButton
+            android:layout_marginEnd="30dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/ib_main_next"
+            android:background="@drawable/icon_next"
+            android:layout_width="20dp"
+            android:layout_height="20dp" />
+    </RelativeLayout>
+    <ImageView
+        android:id="@+id/iv_debug"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="48dp"
+        android:src="@drawable/icon_back"/>
+</RelativeLayout>

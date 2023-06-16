@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    tools:context=".ui.activity.DebugActivity">
+    <Button
+        android:layout_margin="20dp"
+        android:id="@+id/debug_write_music"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="写入音乐文件"/>
+    <Button
+        android:layout_margin="20dp"
+        android:id="@+id/debug_play_music"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="播放音乐文件"/>
+    <Button
+        android:layout_margin="20dp"
+        android:id="@+id/debug_select"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="获取数据库内容"/>
+
+</LinearLayout>

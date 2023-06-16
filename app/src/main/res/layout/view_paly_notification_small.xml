@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:layout_alignParentBottom="true"
+    android:layout_marginBottom="10dp"
+    android:background="@drawable/bg_notification">
+
+    <ImageView
+        android:id="@+id/iv_click_n"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center"
+        android:layout_alignParentEnd="true"
+        android:layout_marginHorizontal="8dp"
+        android:button="@color/white"
+        android:checked="false" />
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginStart="13dp"
+        android:layout_toEndOf="@id/iv_song_img_n"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/tv_song_name_n"
+            android:layout_width="130dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            android:singleLine="true"
+            android:textColor="@color/bottom_text_bg"
+            android:text="测试通知栏歌曲"
+            android:textSize="15dp" />
+        <LinearLayout
+            android:gravity="center_vertical"
+            android:layout_width="130dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_gravity="center_vertical"
+                android:id="@+id/tv_notification_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:background="@color/bottom_text_bg"
+                android:singleLine="true"
+                android:text=" LYRICS "
+                android:textColor="@color/bottom_bg"
+                android:textSize="9dp"
+                android:visibility="visible" />
+
+            <TextView
+                android:text="测试歌手"
+                android:id="@+id/tv_singer_n"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:textColor="@color/bottom_text_bg"
+                android:textSize="11dp" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/iv_song_img_n"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/song_test"
+        />
+</RelativeLayout>
