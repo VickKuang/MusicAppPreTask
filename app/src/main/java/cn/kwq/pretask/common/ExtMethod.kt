@@ -33,7 +33,6 @@ fun Context.readMusicLib(): ArrayList<MusicPathDTO> {
                 "mp3" -> {
                     songPath = "musicLib/${root}/${item}"
                 }
-
                 else -> {
                     imagePath = "musicLib/${root}/${item}"
                 }
@@ -46,7 +45,7 @@ fun Context.readMusicLib(): ArrayList<MusicPathDTO> {
 }
 
 /**
- * 裁剪工具
+ * 裁剪歌曲名工具(歌曲名格式为songName-singer1,singer2,singer3...)
  */
 fun String.splitSong(): MusicMsgDTO {
     val split0 = this.split("/")
@@ -64,7 +63,7 @@ fun String.splitSong(): MusicMsgDTO {
 }
 
 /**
- * 读取assets工具
+ * 读取assets图片工具
  */
 fun String.getImg(): Bitmap? {
     val open = MyApplication.context.assets.open(this)
@@ -73,7 +72,9 @@ fun String.getImg(): Bitmap? {
     return bitmap
 }
 
-//计算播放时间
+/**
+ * 毫秒转换播放时间
+ */
 fun Int.calculateTime(): String? {
     val time = this / 1000
     val minute: Int
@@ -111,7 +112,7 @@ fun Int.calculateTime(): String? {
  * 判断全面屏
  */
 fun Context.isAllScreenDevice(): Boolean {
-    // 低于 API 21的，都不会是全面屏。。。
+    // 低于 API 21的，基本不是全面屏
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
         return false;
     }
@@ -129,5 +130,12 @@ fun Context.isAllScreenDevice(): Boolean {
         height = point.x.toDouble();
     }
     return height / width >= 1.97f
+}
+
+/**
+ * 毫秒转换进度条百分比
+ */
+fun Int.coverSeekBar(songLong:Int):Int{
+    return (((this.toDouble() / songLong.toDouble()) * 100)).toInt()
 }
 

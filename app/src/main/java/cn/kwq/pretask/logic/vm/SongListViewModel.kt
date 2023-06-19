@@ -8,11 +8,13 @@ import cn.kwq.pretask.logic.db.entity.SongEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.concurrent.Callable
 
 class SongListViewModel(application: Application) : AndroidViewModel(application)  {
+    //歌单列表
     var songList: MutableLiveData<MutableList<SongEntity>> = MutableLiveData()
+    //当前播放歌曲
     var playingSong: MutableLiveData<SongEntity> = MutableLiveData()
+    //是否正在播放
     var isPlaying:MutableLiveData<Boolean> = MutableLiveData(false)
 
     fun listSongsFromDB() {
@@ -23,16 +25,6 @@ class SongListViewModel(application: Application) : AndroidViewModel(application
             Thread.sleep(500)
             songList.postValue(songs)
             playingSong.postValue(songs[0])
-        }
-    }
-
-
-
-    fun listSongsFromDBFast() {
-        val dao = SongDatabase.getDatabase(getApplication()).getDao()
-        CoroutineScope(Dispatchers.IO).launch {
-            val songs = dao.listAllSongs()
-            songList.postValue(songs)
         }
     }
 
@@ -48,14 +40,6 @@ class SongListViewModel(application: Application) : AndroidViewModel(application
                 post = songs[0]
             }
             playingSong.postValue(post)
-        }
-    }
-
-    fun listLikesFromDBFast() {
-        val dao = SongDatabase.getDatabase(getApplication()).getDao()
-        CoroutineScope(Dispatchers.IO).launch {
-            val songs = dao.listAllLikes()
-            songList.postValue(songs)
         }
     }
 
@@ -77,6 +61,12 @@ class SongListViewModel(application: Application) : AndroidViewModel(application
     fun changePlayingState(state:Boolean){
         CoroutineScope(Dispatchers.IO).launch {
            isPlaying.postValue(state)
+        }
+    }
+
+    fun refreshDB(){
+        CoroutineScope(Dispatchers.IO).launch{
+
         }
     }
 

@@ -113,11 +113,13 @@
             android:layout_centerInParent="true">
             <ImageButton
                 android:id="@+id/ib_song_pre"
-                android:background="@drawable/icon_pre"
+                android:background="@color/transparent"
                 android:layout_marginTop="5dp"
-                android:layout_width="30dp"
+                android:layout_width="32dp"
                 android:layout_height="30dp"
-                android:src="@drawable/icon_pre"/>
+                android:scaleType="centerCrop"
+                app:srcCompat="@drawable/icon_pre"
+                />
             <CheckBox
                 android:layout_marginHorizontal="30dp"
                 android:id="@+id/cb_song_start"
@@ -131,11 +133,13 @@
                 android:checked="false"/>
             <ImageButton
                 android:id="@+id/ib_song_next"
-                android:background="@drawable/icon_next"
                 android:layout_marginTop="5dp"
-                android:layout_width="30dp"
+                android:background="@color/transparent"
+                android:layout_width="32dp"
                 android:layout_height="30dp"
-                android:src="@drawable/icon_next"/>
+                android:scaleType="centerCrop"
+                app:srcCompat="@drawable/icon_next"
+                />
         </LinearLayout>
 
 

@@ -1,82 +1,47 @@
 package cn.kwq.pretask.ui.activity
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
-import androidx.lifecycle.ViewModelProvider
-import cn.kwq.pretask.MainActivity
 import cn.kwq.pretask.R
-import cn.kwq.pretask.common.calculateTime
+import cn.kwq.pretask.common.BaseActivity
 import cn.kwq.pretask.common.getImg
 import cn.kwq.pretask.common.isAllScreenDevice
 import cn.kwq.pretask.databinding.ActivityPlayBinding
-import cn.kwq.pretask.logic.vm.SongListViewModel
-import cn.kwq.pretask.ui.adapter.SongsAdapter
-import cn.kwq.pretask.ui.helper.media.MediaPlayerHelper
+import cn.kwq.pretask.helper.media.MediaPlayerHelper
+import cn.kwq.pretask.logic.msgProvider.PlayerMsgProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Timer
 import java.util.TimerTask
-import kotlin.concurrent.timer
-import kotlin.coroutines.coroutineContext
-import kotlin.math.log
 
-class PlayActivity : AppCompatActivity() {
+class PlayActivity : BaseActivity(), View.OnClickListener {
+
     var isSeekbarChanging = false//互斥变量，防止进度条和定时器冲突。
-
     lateinit var binding: ActivityPlayBinding
-    private var songLong: Int = 0
-    val instance = MediaPlayerHelper.getInstance()
+    lateinit var player: MediaPlayerHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPlayBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        if (!isAllScreenDevice()) binding.vBottomBox.visibility = View.GONE //非全面屏适配
+        player= MediaPlayerHelper.getInstance()
+        initView()//初始化工作
+        val vm = player.vm
 
         //当前歌曲发生变化 刷新页面
-        instance.vm.playingSong.observe(this) {
+        vm.playingSong.observe(this) {
             refresh()
-        }
-
-        /**
-         * 返回按钮
-         */
-        binding.ivBack.setOnClickListener {
-            finish()
-            overridePendingTransition(R.anim.top_in, R.anim.top_out)
-
-        }
-        refresh()//刷新数据
-
-        binding.ibSongPre.setOnClickListener {
-            instance.pre()
-        }
-
-        binding.ibSongNext.setOnClickListener {
-            instance.next()
-        }
-        binding.cbSongStart.setOnClickListener {
-            it.isSelected = !it.isSelected
-            if (instance.state()) {
-                instance.stop()
-            } else {
-                instance.start()
-            }
         }
         /**
          * 进度条更改
          */
         binding.sebPlaySeekBar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
-                val songWhen = instance.getSongWhen()
-                binding.tvPlayNow.text = songWhen ?: "0:00"
+                binding.tvPlayNow.text = PlayerMsgProvider.getCurrentTime() ?: "0:00"
             }
 
             override fun onStartTrackingTouch(p0: SeekBar?) {
@@ -85,51 +50,93 @@ class PlayActivity : AppCompatActivity() {
 
             override fun onStopTrackingTouch(seekbar: SeekBar) {
                 isSeekbarChanging = false
-                instance.seekTo(seekbar.progress)
-                binding.cbSongStart.isSelected = instance.state()
+               /* val intent = Intent(this@PlayActivity,MediaBroadcast::class.java).apply {
+                    action = MediaBroadcast.SEEK_TO
+                    putExtra("SeekTo",seekbar.progress)
+                }
+                sendBroadcast(intent)*/
+                player.seekTo(seekbar.progress)
+                binding.cbSongStart.isSelected = PlayerMsgProvider.isPlaying()
 
             }
         })
-        /**
-         * 定时器更改进度条状态
-         */
+
+
+
+    }
+
+    private fun initView(){
+        //非全面屏适配
+        if (!isAllScreenDevice()) binding.vBottomBox.visibility = View.GONE
+        //初始化点击事件
+        initCLick()
+        //刷新页面数据
+        refresh()
+        //初始化定时器
         val timer = Timer()
         timer.schedule(object : TimerTask() {
             override fun run() {
-                if (!isSeekbarChanging) {
-                    syncSeekBar()
-                }
-            }
-        }, 0, 500)
-
-
+                if (!isSeekbarChanging) { syncSeekBar() }
+            } }, 0, 100)
+    }
+    private fun initCLick(){
+        binding.ivBack.setOnClickListener(this)
+        binding.ibSongPre.setOnClickListener(this)
+        binding.ibSongNext.setOnClickListener (this)
+        binding.cbSongStart.setOnClickListener(this)
     }
 
     private fun refresh() {
         /**
          * 获取播放中歌曲数据(渲染界面)
          */
-        binding.ivSongImg.setImageBitmap(instance.getPlayingSongMsg().imgPath.getImg())
-        binding.tvPlaySinger.text = instance.getPlayingSongMsg().singer
-        binding.tvPlaySongName.text = instance.getPlayingSongMsg().songName
-        binding.tvPlayEnd.text = instance.getSongSize() ?: "0:00"
-        songLong = instance.getSongLong() ?: 0
-        //播放状态
-        binding.cbSongStart.isSelected = instance.state()
-
+        PlayerMsgProvider.let {
+            binding.ivSongImg.setImageBitmap(it.getSong()?.imgPath?.getImg())
+            binding.tvPlaySinger.text = it.getSong()?.singer
+            binding.tvPlaySongName.text = it.getSong()?.songName
+            binding.tvPlayEnd.text = it.getTime()
+            //播放状态
+            binding.cbSongStart.isSelected = it.isPlaying()
+        }
         syncSeekBar()
     }
 
+    override fun onClick(view: View) {
+        when (view.id) {
+            R.id.iv_back -> {
+                finish()
+                overridePendingTransition(R.anim.top_in, R.anim.top_out)
+            }
+            R.id.ib_song_pre -> {
+                player.pre()
+            }
+            R.id.ib_song_next -> {
+                player.next()
+            }
+            R.id.cb_song_start -> {
+                binding.cbSongStart.let {
+                    it.isSelected = !it.isSelected
+                    if (!PlayerMsgProvider.isPlaying()) {
+                        player.start()
+                    } else {
+                        player.stop()
+                    }
+                }
+            }
+        }
+    }
     /**
      * 同步seekbar 和 音乐
      */
     private fun syncSeekBar() {
-        CoroutineScope(Dispatchers.Main).launch {
-            binding.tvPlayNow.text = instance.getSongWhen() ?: "0:00"
-            instance.getSongNow()?.let {
-                binding.sebPlaySeekBar.progress =
-                    (it.toDouble() / songLong.toDouble() * 100).toInt()
+        CoroutineScope(Dispatchers.IO).launch {
+            val currentCoverSeek = PlayerMsgProvider.getCurrentCoverSeek()
+            val currentTime = PlayerMsgProvider.getCurrentTime()
+            withContext(Dispatchers.Main){
+                binding.sebPlaySeekBar.progress = currentCoverSeek
+                binding.tvPlayNow.text = currentTime
             }
+
         }
     }
 

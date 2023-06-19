@@ -1,14 +1,14 @@
-package cn.kwq.pretask.ui.helper.media
+package cn.kwq.pretask.helper.media
 
 
 import android.media.MediaPlayer
 import androidx.lifecycle.ViewModelProvider
 import cn.kwq.pretask.MainActivity
 import cn.kwq.pretask.common.MyApplication
-import cn.kwq.pretask.common.calculateTime
+import cn.kwq.pretask.helper.notification.NotificationUtils
 import cn.kwq.pretask.logic.db.entity.SongEntity
+import cn.kwq.pretask.logic.dto.PlayingSongMsgDTO
 import cn.kwq.pretask.logic.vm.SongListViewModel
-import cn.kwq.pretask.ui.helper.notification.NotificationHelper
 import kotlin.streams.toList
 
 /**
@@ -25,45 +25,40 @@ object MediaPlayerHelper {
      * 保证单例（获得实体播放器的时候一定是当前唯一的播放器）
      */
     fun getInstance(): MediaPlayerHelper {
-        mediaPlayer?.let {
+        mediaPlayer?.also{
             return this
         }
         mediaPlayer = MediaPlayer()
-        mediaPlayer?.setOnCompletionListener {
-            next()
-        }
-        return this
-    }
-
-    //重载
-    fun getInstance(mainActivity: MainActivity): MediaPlayerHelper {
-        //获取属于main activity的view model
-        vm = ViewModelProvider(mainActivity).get(SongListViewModel::class.java)
-        mediaPlayer?.let {
-            return this
-        }
-        mediaPlayer = MediaPlayer()
-        mediaPlayer?.setOnCompletionListener {
-            next()
-        }
         return this
     }
 
     /**
-     * mediaplayer 状态 防止错误状态下启动
+     * 保证单例（获得实体播放器的时候一定是当前唯一的播放器）
      */
-    fun isAlive(): Boolean {
-        var alive = true
-        if (mediaPlayer == null) alive = false
-        if (musicList.isEmpty()) alive = false
-        return alive
+    fun getInstance(mainActivity: MainActivity): MediaPlayerHelper {
+        mediaPlayer?.also{
+            return this
+        }
+        vm = ViewModelProvider(mainActivity).get(SongListViewModel::class.java)
+        mediaPlayer = MediaPlayer()
+        mediaPlayer?.setOnCompletionListener {
+            next()
+        }
+        return this
     }
 
     /**
      * 获取当前播放歌曲相关信息
      */
-    fun getPlayingSongMsg(): SongEntity {
-        return musicList[index]
+    fun getPlayingSongMsg(): PlayingSongMsgDTO {
+        return if (mediaPlayer != null&& musicList.isNotEmpty()){
+            PlayingSongMsgDTO(
+                musicList[index], mediaPlayer!!.isPlaying,true,
+                mediaPlayer!!.duration,
+                mediaPlayer!!.currentPosition)
+        }else{
+            PlayingSongMsgDTO(null,false, isAlive = false,null,null)
+        }
     }
 
     /**
@@ -74,7 +69,7 @@ object MediaPlayerHelper {
         if (list.isNotEmpty()) {
             setMusicPath(list[0].path)
             list[0].let {
-                NotificationHelper.update(it.songName,it.singer,it.imgPath)
+                NotificationUtils.update(it.songName,it.singer,it.imgPath)
             }
         }
         index = 0
@@ -85,16 +80,18 @@ object MediaPlayerHelper {
      * 下一曲
      */
     fun next() {
-        if (index < (musicList.size - 1)) {
-            index += 1
-        } else {
-            index = 0
+        if (musicList.isNotEmpty()){
+            if (index < (musicList.size - 1)) {
+                index += 1
+            } else {
+                index = 0
+            }
+            setMusicPath(musicList[index].path)
+            musicList[index].let {
+                NotificationUtils.update(it.songName,it.singer,it.imgPath)
+            }
+            start()
         }
-        setMusicPath(musicList[index].path)
-        musicList [index].let {
-            NotificationHelper.update(it.songName,it.singer,it.imgPath)
-        }
-        start()
     }
 
     /**
@@ -117,7 +114,7 @@ object MediaPlayerHelper {
         }
         setMusicPath(musicList[index].path)
         musicList [index].let {
-            NotificationHelper.update(it.songName,it.singer,it.imgPath)
+            NotificationUtils.update(it.songName,it.singer,it.imgPath)
         }
         start()
     }
@@ -126,12 +123,12 @@ object MediaPlayerHelper {
      * 播放
      */
     fun start() {
-        mediaPlayer?.let {
+        mediaPlayer?.let { player->
             if (musicList.isNotEmpty()){
-                it.start()
-                vm.updatePlayingSong(getPlayingSongMsg())
+                player.start()
+                vm.updatePlayingSong(getPlayingSongMsg().song)
                 musicList [index].let {
-                    NotificationHelper.update(it.songName,it.singer,it.imgPath)
+                    NotificationUtils.update(it.songName,it.singer,it.imgPath)
                 }
             }
         }
@@ -147,9 +144,12 @@ object MediaPlayerHelper {
             val ms = duration.times((pos.toDouble() / 100)).toInt()
             seekTo(ms)
             start()
-            musicList [index].let {
-                NotificationHelper.update(it.songName,it.singer,it.imgPath)
+            if (musicList.isNotEmpty()){
+                musicList [index].let {
+                    NotificationUtils.update(it.songName,it.singer,it.imgPath)
+                }
             }
+
         }
 
     }
@@ -162,48 +162,9 @@ object MediaPlayerHelper {
             mediaPlayer?.pause()
             vm.changePlayingState(false)
             musicList [index].let {
-                NotificationHelper.update(it.songName,it.singer,it.imgPath)
+                NotificationUtils.update(it.songName,it.singer,it.imgPath)
             }
         }
-    }
-
-    /**
-     * 当前歌曲状态 播放 or 暂停
-     */
-    fun state(): Boolean {
-        var state = false
-        mediaPlayer?.let {
-            state = it.isPlaying
-        }
-        return state
-    }
-
-    /**
-     * 歌曲时长
-     */
-    fun getSongSize(): String? {
-        return mediaPlayer?.duration?.calculateTime()
-    }
-
-    /**
-     * 歌曲长度
-     */
-    fun getSongLong(): Int? {
-        return mediaPlayer?.duration
-    }
-
-    /**
-     * 歌曲当前进度
-     */
-    fun getSongNow(): Int? {
-        return mediaPlayer?.currentPosition
-    }
-
-    /**
-     * 歌曲当前时间
-     */
-    fun getSongWhen(): String? {
-        return mediaPlayer?.currentPosition?.calculateTime()
     }
 
     /**
@@ -214,8 +175,8 @@ object MediaPlayerHelper {
             mediaPlayer = MediaPlayer()
         }
         mediaPlayer?.reset()//更新播放器
-        mediaPlayer?.setOnCompletionListener {
-            next()
+        mediaPlayer?.let{
+            mediaPlayer =MediaPlayer()
         }
         path?.let {
             val musicFile = MyApplication.context.assets.openFd(it)

@@ -1,25 +1,12 @@
 package cn.kwq.pretask.ui.activity
 
 import android.annotation.SuppressLint
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.content.ComponentName
-import android.graphics.BitmapFactory
-import android.media.AudioManager
-import android.media.MediaController2.ControllerCallback
 import android.os.Build
 import android.os.Bundle
-import android.support.v4.media.MediaBrowserCompat
-import android.support.v4.media.session.MediaControllerCompat
-import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
-import android.widget.RemoteViews
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.NotificationCompat
-import androidx.media.session.MediaButtonReceiver
-import cn.kwq.pretask.R
+import cn.kwq.pretask.common.BaseActivity
 import cn.kwq.pretask.common.readMusicLib
 import cn.kwq.pretask.common.simpleToast
 import cn.kwq.pretask.common.splitSong
@@ -31,7 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-class DebugActivity : AppCompatActivity() {
+class DebugActivity : BaseActivity() {
 
     companion object {
         //文件读写需要获取的权限

@@ -3,6 +3,7 @@ package cn.kwq.pretask.logic.db.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.io.Serializable
 
 @Entity(tableName = "songs")
 data class SongEntity(@ColumnInfo(name = "is_like")
@@ -14,8 +15,9 @@ data class SongEntity(@ColumnInfo(name = "is_like")
                       @ColumnInfo(name = "img_path")
                       var imgPath:String,
                       @ColumnInfo(name = "singer")
-                      var singer:String) {
+                      var singer:String): Serializable {
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
+
 
 }

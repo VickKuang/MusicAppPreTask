@@ -11,9 +11,9 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import cn.kwq.pretask.MainActivity
 import cn.kwq.pretask.R
 import cn.kwq.pretask.common.getImg
+import cn.kwq.pretask.helper.media.MediaPlayerHelper
 import cn.kwq.pretask.logic.db.entity.SongEntity
 import cn.kwq.pretask.logic.vm.SongListViewModel
-import cn.kwq.pretask.ui.helper.media.MediaPlayerHelper
 import com.google.android.material.imageview.ShapeableImageView
 
 class SongsAdapter(private val list: MutableList<SongEntity>) : Adapter<SongsAdapter.Holder>() {
@@ -54,6 +54,11 @@ class SongsAdapter(private val list: MutableList<SongEntity>) : Adapter<SongsAda
 
         //点击播放
         holder.itemBox.setOnClickListener {
+/*            val intent = Intent(viewModelStoreOwner, MediaBroadcast::class.java).apply {
+                action = MediaBroadcast.SEEK_TO
+                putExtra("StartWithPath",seekbar.progress)
+            }
+            sendBroadcast(intent)*/
             val instance = MediaPlayerHelper.getInstance()
             instance.prepare(songEntity.path)
             instance.start()
