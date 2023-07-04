@@ -1,5 +1,6 @@
 package cn.kwq.pretask.ui.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.SeekBar
@@ -10,14 +11,17 @@ import cn.kwq.pretask.common.getImg
 import cn.kwq.pretask.common.isAllScreenDevice
 import cn.kwq.pretask.databinding.ActivityPlayBinding
 import cn.kwq.pretask.helper.media.MediaPlayerHelper
+import cn.kwq.pretask.helper.notification.NotificationUtils
 import cn.kwq.pretask.logic.msgProvider.PlayerMsgProvider
+import cn.kwq.pretask.ui.broadcast.MediaBroadcast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Timer
 import java.util.TimerTask
-
+private const val NEXT="Next"
+private const val PRE="Pre"
 class PlayActivity : BaseActivity(), View.OnClickListener {
 
     var isSeekbarChanging = false//互斥变量，防止进度条和定时器冲突。
@@ -29,6 +33,7 @@ class PlayActivity : BaseActivity(), View.OnClickListener {
         binding = ActivityPlayBinding.inflate(layoutInflater)
         setContentView(binding.root)
         player= MediaPlayerHelper.getInstance()
+
         initView()//初始化工作
         val vm = player.vm
 
@@ -44,8 +49,9 @@ class PlayActivity : BaseActivity(), View.OnClickListener {
                 binding.tvPlayNow.text = PlayerMsgProvider.getCurrentTime() ?: "0:00"
             }
 
-            override fun onStartTrackingTouch(p0: SeekBar?) {
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
                 isSeekbarChanging = true
+                binding.tvPlayNow.text = PlayerMsgProvider.getCurrentChange(seekBar.progress)
             }
 
             override fun onStopTrackingTouch(seekbar: SeekBar) {
@@ -57,6 +63,7 @@ class PlayActivity : BaseActivity(), View.OnClickListener {
                 sendBroadcast(intent)*/
                 player.seekTo(seekbar.progress)
                 binding.cbSongStart.isSelected = PlayerMsgProvider.isPlaying()
+
 
             }
         })
@@ -81,8 +88,12 @@ class PlayActivity : BaseActivity(), View.OnClickListener {
     }
     private fun initCLick(){
         binding.ivBack.setOnClickListener(this)
-        binding.ibSongPre.setOnClickListener(this)
-        binding.ibSongNext.setOnClickListener (this)
+        binding.ibSongPre.setOnClickListener{
+            player.pre()
+        }
+        binding.ibSongNext.setOnClickListener{
+            player.next()
+        }
         binding.cbSongStart.setOnClickListener(this)
     }
 
@@ -106,12 +117,6 @@ class PlayActivity : BaseActivity(), View.OnClickListener {
             R.id.iv_back -> {
                 finish()
                 overridePendingTransition(R.anim.top_in, R.anim.top_out)
-            }
-            R.id.ib_song_pre -> {
-                player.pre()
-            }
-            R.id.ib_song_next -> {
-                player.next()
             }
             R.id.cb_song_start -> {
                 binding.cbSongStart.let {

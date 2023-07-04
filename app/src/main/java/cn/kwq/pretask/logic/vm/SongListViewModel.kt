@@ -64,11 +64,6 @@ class SongListViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun refreshDB(){
-        CoroutineScope(Dispatchers.IO).launch{
-
-        }
-    }
 
 
 }

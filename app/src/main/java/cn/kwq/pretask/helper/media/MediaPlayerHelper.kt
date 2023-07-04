@@ -19,17 +19,21 @@ object MediaPlayerHelper {
     private var musicList: List<SongEntity> = ArrayList<SongEntity>()//播放列表
     private var mediaPlayer: MediaPlayer? = null  //播放器
     private var index = 0 //歌单当前进度
-    lateinit var vm: SongListViewModel//MainActivity的vm用于更新当前播放
+    lateinit var vm: SongListViewModel//MainActivity的vm用于更新当前播放歌曲
+
+    private var isNextIng = false //是否正在切歌
 
     /**
      * 保证单例（获得实体播放器的时候一定是当前唯一的播放器）
      */
     fun getInstance(): MediaPlayerHelper {
-        mediaPlayer?.also{
-            return this
+        return if (mediaPlayer != null) {
+            this
+        }else{
+            mediaPlayer = MediaPlayer()
+            this
         }
-        mediaPlayer = MediaPlayer()
-        return this
+
     }
 
     /**
@@ -40,12 +44,16 @@ object MediaPlayerHelper {
             return this
         }
         vm = ViewModelProvider(mainActivity).get(SongListViewModel::class.java)
+
         mediaPlayer = MediaPlayer()
-        mediaPlayer?.setOnCompletionListener {
+        mediaPlayer!!.setOnCompletionListener {
             next()
         }
+        //播放错误时，跳过该歌曲 继续播放下一首
+        mediaPlayer!!.setOnErrorListener { _, _, _ -> true }
         return this
     }
+
 
     /**
      * 获取当前播放歌曲相关信息
@@ -53,9 +61,11 @@ object MediaPlayerHelper {
     fun getPlayingSongMsg(): PlayingSongMsgDTO {
         return if (mediaPlayer != null&& musicList.isNotEmpty()){
             PlayingSongMsgDTO(
-                musicList[index], mediaPlayer!!.isPlaying,true,
-                mediaPlayer!!.duration,
-                mediaPlayer!!.currentPosition)
+                musicList[index],
+                mediaPlayer!!.isPlaying,
+                true,
+                mediaPlayer?.duration,
+                mediaPlayer?.currentPosition)
         }else{
             PlayingSongMsgDTO(null,false, isAlive = false,null,null)
         }
@@ -66,13 +76,14 @@ object MediaPlayerHelper {
      */
     fun changeMusicList(list: List<SongEntity>) {
         musicList = list
+        index = 0
         if (list.isNotEmpty()) {
             setMusicPath(list[0].path)
             list[0].let {
                 NotificationUtils.update(it.songName,it.singer,it.imgPath)
             }
         }
-        index = 0
+
 
     }
 
@@ -80,18 +91,19 @@ object MediaPlayerHelper {
      * 下一曲
      */
     fun next() {
-        if (musicList.isNotEmpty()){
-            if (index < (musicList.size - 1)) {
-                index += 1
-            } else {
-                index = 0
+        if (!isNextIng){
+            if (musicList.isNotEmpty()){
+                if (index < (musicList.size - 1)) {
+                    index += 1
+                } else {
+                    index = 0
+                }
+                setMusicPath(musicList[index].path)
+                start()
             }
-            setMusicPath(musicList[index].path)
-            musicList[index].let {
-                NotificationUtils.update(it.songName,it.singer,it.imgPath)
-            }
-            start()
         }
+        isNextIng=false
+
     }
 
     /**
@@ -113,9 +125,9 @@ object MediaPlayerHelper {
             index = musicList.size - 1
         }
         setMusicPath(musicList[index].path)
-        musicList [index].let {
-            NotificationUtils.update(it.songName,it.singer,it.imgPath)
-        }
+//        musicList [index].let {
+//            NotificationUtils.update(it.songName,it.singer,it.imgPath)
+//        }
         start()
     }
 
@@ -171,17 +183,17 @@ object MediaPlayerHelper {
      * 切换歌曲就要销毁上一个播放器 保证播放器唯一
      */
     private fun setMusicPath(path: String?) {
-        if (mediaPlayer ==null){
-            mediaPlayer = MediaPlayer()
-        }
-        mediaPlayer?.reset()//更新播放器
-        mediaPlayer?.let{
-            mediaPlayer =MediaPlayer()
-        }
+        mediaPlayer?.reset()
         path?.let {
             val musicFile = MyApplication.context.assets.openFd(it)
             mediaPlayer?.setDataSource(musicFile)
-            mediaPlayer?.prepare()
+            try {
+                mediaPlayer?.prepare()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }finally {
+                musicFile.close()
+            }
         }
     }
 

@@ -49,6 +49,7 @@ class MainActivity : BaseActivity(),OnClickListener {
         setContentView(binding.root)
         player= MediaPlayerHelper.getInstance(this)
 
+
         //初始化
         initView()
         setObserver()//观察逻辑

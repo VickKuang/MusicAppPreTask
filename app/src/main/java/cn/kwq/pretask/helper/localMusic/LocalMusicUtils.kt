@@ -14,7 +14,8 @@ import cn.kwq.pretask.ui.activity.DebugActivity
  */
 object LocalMusicUtils {
 
-    val PERMISSIONS = arrayOf(
+    //申请权限列表
+    private val PERMISSIONS = arrayOf(
         android.Manifest.permission.READ_EXTERNAL_STORAGE,
         android.Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
@@ -31,7 +32,7 @@ object LocalMusicUtils {
             } else {
                 "获取权限失败".simpleToast(context)
             }
-        }.launch(DebugActivity.PERMISSIONS)//获取权限
+        }.launch(PERMISSIONS)//获取权限
 
         val list: MutableList<SongEntity> = ArrayList<SongEntity>()
         // 媒体库查询语句（写一个工具类MusicUtils）
